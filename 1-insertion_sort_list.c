@@ -3,52 +3,48 @@
 /**
  * insertion_sort_list - Sorts a doubly linked list of integers in ascending order
  * using the Insertion sort algorithm.
- * @list: The doubly linked list to be sorted.
+ * @list: The doubly linked list to be sorted
  */
 
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *curr = NULL;
-	listint_t *insertion = NULL;
+	listint_t *sorted = NULL, *unsorted = NULL, *temp = NULL;
 
-	if (list == NULL || *list == NULL || (*list)->next == NULL)
+	if (list == NULL || (*list)->next == NULL)
 		return;
-
-	curr = (*list)->next;
-	insertion = curr->prev;
-	while (curr != NULL)
+	unsorted = (*list)->next;
+	while (unsorted != NULL)
 	{
-		insertion = curr->prev;
-		while (insertion != NULL && insertion->n > curr->n)
+		sorted = unsorted->prev;
+		temp = unsorted->next;
+		while (sorted != NULL)
 		{
-			move_left(curr, insertion, list);
-			insertion = curr->prev;
+			if (unsorted->n < sorted->n)
+			{
+				sorted = sorted->prev;
+				if (unsorted->next != NULL)
+				{
+					unsorted->next->prev = unsorted->prev;
+				}
+				unsorted->prev->next = unsorted->next;
+				unsorted->prev = sorted;
+				if (sorted == NULL)
+				{
+					(*list)->prev = unsorted;
+					unsorted->next = *list;
+					*list = unsorted;
+				}
+				else
+				{
+					sorted->next->prev = unsorted;
+					unsorted->next = sorted->next;
+					sorted->next = unsorted;
+				}
+				print_list(*list);
+			}
+			else
+				break;
 		}
-		curr = curr->next;
+		unsorted = temp;
 	}
-}
-
-/**
- * move_left - Swaps two members of a list.
- * @curr: The current node to be moved to the left of insertion.
- * @insertion: The insertion pointer.
- * @head: The head of the list.
- */
-
-void move_left(listint_t *curr, listint_t *insertion, listint_t **head)
-{
-	listint_t *swap1 = curr->next;
-	listint_t *swap2 = insertion->prev;
-
-	if (swap1 != NULL)
-		swap1->prev = insertion;
-	if (swap2 != NULL)
-		swap2->next = curr;
-	curr->prev = swap2;
-	insertion->next = swap1;
-	curr->next = insertion;
-	insertion->prev = curr;
-	if (*head == insertion)
-		*head = curr;
-	print_list(*head);
 }
